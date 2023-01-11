@@ -205,7 +205,7 @@ movq %rsp, %rsi
 movl $16, %edx
 movq $1, 64(%rbx)
 movq %rbx, %rdi
-call poly1305_blocks_x86
+call poly1305_blocks_x86_local
 poly1305_finish_ext_x86_11:
 movabsq $17592186044415, %rdx
 movq 32(%rbx), %rsi
