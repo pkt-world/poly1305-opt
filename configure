@@ -27,6 +27,7 @@ Configuration options:
   --pic                               pass -fPIC to the compiler, required to build shared library
   --strict                            use strict compiler flags for C
   --yasm                              use yasm to compile external asm
+  --private                           do not mark library functions for external visibility, most useful in a static library
 
 EOF
 exit 1
@@ -173,6 +174,7 @@ bits64="no"
 strict="no"
 yasm="no"
 pic="no"
+private="no"
 
 appdir="app"
 prefix="/usr/local"
@@ -228,6 +230,9 @@ while [ "$1" != "" ]; do
                    ;;
 
         --yasm ) yasm="yes"
+                 ;;
+
+        --private ) private="yes"
                  ;;
 
         * ) echo "Unknown paramaters $1, skipping.."
@@ -542,7 +547,9 @@ if try_c "#include <sys/time.h> int main(void) { struct timeval t; gettimeofday(
 fi
 
 # visibility
-if try_c_visibility '__attribute__ ((dllexport))'; then
+if [ "$private" = "yes" ]; then
+    CFLAGS="$CFLAGS -fvisibility=hidden -DLIB_PUBLIC=\"\" "
+elif try_c_visibility '__attribute__ ((dllexport))'; then
     LIB_EXPORT="__attribute__ ((dllexport))"
     LIB_IMPORT="__attribute__ ((dllimport))"
     CFLAGS="$CFLAGS -fvisibility=hidden -DLIB_PUBLIC=\"__attribute__ ((dllexport))\""
